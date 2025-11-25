@@ -1,0 +1,9 @@
+typing_extensions
+langchain
+anthropic
+langgraph
+langchain-core
+pydantic
+langchain-anthropic
+dotenv
+
