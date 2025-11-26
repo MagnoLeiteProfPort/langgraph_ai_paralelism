@@ -12,7 +12,7 @@ import json
 # CONFIG & ENV
 # ============================================================
 
-LOGGER_NAME = "prompt_chaining"
+LOGGER_NAME = "prompt_parallelism"
 logger = logging.getLogger(LOGGER_NAME)
 
 dotenv.load_dotenv()
