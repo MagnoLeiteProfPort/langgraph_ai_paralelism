@@ -1,147 +1,119 @@
-# Outfit Gender Classification Workflow
+# 🧥 Outfit Gender Classification Workflow (Full Stack Edition)
 
-A modern, clean, and production‑ready multi‑agent LangGraph workflow that generates an outfit
-(head, torso, legs) **in parallel**, classifies each clothing item as **male**, **female**, or **none**, and validates whether the outfit is gender‑consistent.
+A fully containerized **LangGraph + FastAPI backend** and **Django + React frontend** delivering a complete, modern, production‑ready outfit generation workflow.
 
-If the outfit is:
+This system:
 
-- **All male** → approved
-- **All female** → approved
-- **Mixed/none** → regenerated until approved or until `MAX_ATTEMPTS` is reached
-
-The workflow is fully configurable through the `.env` file and automatically exports a graph diagram:
-`workflow_graph.png`.
-
----
-
-## 🚀 Features
-
-### ✅ Parallel Generation
-
-Three independent nodes generate:
-
-- Head clothing
-- Torso clothing
-- Leg clothing
-
-All run concurrently for speed and modularity.
-
-### ✅ Robust Validation
-
-The validator:
-
-- Classifies each item as **male / female / none**
-- Determines overall outfit gender
-- Enforces consistency rules
-- Loops intelligently up to `MAX_ATTEMPTS`
-
-### ✅ Configurable via `.env`
-
-Environment variables:
-
-```
-MAX_ATTEMPTS=5
-ANTHROPIC_API_KEY=YOUR_KEY
-```
-
-### 🧠 Powered by Anthropic Claude (via LangChain)
-
-Uses:
-
-- `ChatAnthropic`
-- `langgraph` StateGraph workflow engine
+- Generates **head, torso, and leg clothing items in parallel**
+- Classifies each item as **male**, **female**, or **none**
+- Validates if the outfit is gender‑consistent
+- Retries generation intelligently until consistent or `MAX_ATTEMPTS`
+- Exposes a **REST API** via FastAPI
+- Provides a **modern web UI** (Django + CDN React)
+- Runs locally **and** via **Docker Compose**
+- Auto‑generates a workflow diagram:  
+  **`workflow_graph.png`**
 
 ---
 
-## 🗂 Project Structure
+# 🚀 Features
+
+## 🔷 Parallel Generation (LangGraph)
+
+Three independent nodes run concurrently:
+
+- **Head clothing**
+- **Torso clothing**
+- **Leg clothing**
+
+## 🔷 Smart Validation Logic
+
+The workflow ensures:
+
+| Condition          | Result                        |
+| ------------------ | ----------------------------- |
+| All items → male   | ✔ Approved                    |
+| All items → female | ✔ Approved                    |
+| Mixed / none       | ❌ Retry (until max attempts) |
+
+`none` is only used for _invalid or unreadable items_, not unisex clothing.
+
+## 🔷 API‑Driven Architecture
+
+Your LangGraph workflow is wrapped in a clean, modern **FastAPI** service:
+
+- `POST /generate-outfit` → runs the workflow
+- `GET /health` → heartbeat
+
+## 🔷 Modern Frontend
+
+A simple yet polished UI built with:
+
+- **Django** (backend for static & templating)
+- **React (CDN, JSX via Babel)**
+
+Frontend features:
+
+- Generate button
+- Live status
+- Beautiful badges for genders and validation
+- Displays all items and workflow attempts
+
+## 🔷 Complete Docker Support
+
+The entire system (API + Frontend) runs using:
+
+```bash
+docker compose up --build
+```
+
+---
+
+# 🗂 Project Structure
 
 ```
-project/
+outfit-workflow/
 │
-├── main.py                  # Full workflow implementation
-├── workflow_graph.png       # Auto‑generated workflow diagram
-├── .env                     # Runtime configuration (not committed)
-├── .env.example             # Template for config
-└── README.md                # This documentation
+├── docker-compose.yml
+├── .env
+├── .env.example
+│
+├── api/
+│   ├── Dockerfile
+│   ├── requirements.txt
+│   └── app/
+│       ├── __init__.py
+│       ├── main.py               # FastAPI service
+│       └── outfit_workflow.py    # LangGraph workflow logic
+│
+└── web/
+    ├── Dockerfile
+    ├── requirements.txt
+    ├── manage.py
+    ├── web/
+    │   ├── settings.py
+    │   ├── urls.py
+    │   ├── wsgi.py
+    │   └── __init__.py
+    └── ui/
+        ├── views.py
+        ├── urls.py
+        ├── templates/ui/index.html
+        └── static/ui/app.jsx
 ```
 
 ---
 
-## 📦 Installation
+# ⚙️ Configuration
 
-### 1. Clone the repository
-
-```bash
-git clone https://github.com/your-repo/outfit-gender-workflow
-cd outfit-gender-workflow
-```
-
-### 2. Create and activate a virtual environment
-
-```bash
-python -m venv .venv
-source .venv/bin/activate        # Mac/Linux
-# or
-.\.venv\Scripts\ctivate         # Windows
-```
-
-### 3. Install dependencies
-
-```bash
-pip install -r requirements.txt
-```
-
-### 4. Configure environment variables
-
-Copy the example:
-
-```bash
-cp .env.example .env
-```
-
-Fill in your `ANTHROPIC_API_KEY`.
-
----
-
-## ▶️ Running the Workflow
-
-To execute the entire outfit‑generation pipeline:
-
-```bash
-python main.py
-```
-
-During execution, you will see:
-
-- Step‑by‑step logs of the three generated items
-- Gender classification per item
-- Retry loop logic
-- Final accepted outfit
-
-A graph diagram will be generated automatically:
-
-👉 **`workflow_graph.png`**
-
----
-
-## 🧩 Workflow Diagram
-
-Below is the generated diagram representing the full LangGraph logic:
-
-![Workflow Diagram](workflow_graph.png)
-
----
-
-## ⚙️ Configuration
-
-### `.env`
+## `.env`
 
 ```
-ANTHROPIC_API_KEY=YOUR_KEY_HERE
+ANTHROPIC_API_KEY=YOUR_ANTHROPIC_API_KEY
 MAX_ATTEMPTS=5
 ```
 
-### `.env.example`
+## `.env.example`
 
 ```
 ANTHROPIC_API_KEY=
@@ -150,41 +122,115 @@ MAX_ATTEMPTS=5
 
 ---
 
-## 🎯 Validation Logic
+# ▶️ Running Locally (Without Docker)
 
-| Condition          | Result                        |
-| ------------------ | ----------------------------- |
-| All items → male   | ✔ Approved                    |
-| All items → female | ✔ Approved                    |
-| Anything else      | ❌ Retry (until max attempts) |
+1. Create virtualenv:
 
-The logic guarantees deterministic validation even when clothing items are gender‑ambiguous.
+```bash
+python -m venv .venv
+source .venv/bin/activate       # Linux/Mac
+.\.venv\Scripts/activate        # Windows
+```
+
+2. Install dependencies:
+
+```bash
+pip install -r api/requirements.txt
+pip install -r web/requirements.txt
+```
+
+3. Run backend:
+
+```bash
+cd api
+uvicorn app.main:app --reload --port 8001
+```
+
+4. Run frontend:
+
+```bash
+cd web
+python manage.py runserver
+```
+
+Frontend → **http://localhost:8000**  
+API → **http://localhost:8001**
 
 ---
 
-## 🧪 Extend / Customize
+# 🐳 Running With Docker (Recommended)
 
-You can easily:
+On project root:
 
-- Add more clothing categories (shoes, accessories…)
-- Customize gender rules
-- Add persistent memory between runs
-- Implement more detailed fashion classification models
+### Build + Start All Services
+
+```bash
+docker compose up --build
+```
+
+### Stop
+
+```bash
+docker compose down
+```
+
+## Services
+
+| Service  | URL                   |
+| -------- | --------------------- |
+| Frontend | http://localhost:8000 |
+| API      | http://localhost:8001 |
+
+The workflow diagram is exported to:
+
+```
+api/workflow_graph.png
+```
 
 ---
 
-## 📄 License
+# 🧩 Workflow Diagram
 
-This project is provided for demonstration and educational purposes.
-
----
-
-## 👤 Author
-
-Developed by **Magno Leite**  
-Software Engineering & AI Workflows
+![Workflow Diagram](workflow_graph.png)
 
 ---
 
-Enjoy exploring the workflow!  
-Feel free to contribute improvements 🚀
+# 🧠 Technology Stack
+
+### Backend
+
+- LangGraph
+- LangChain Anthropic
+- FastAPI
+- Python 3.11
+
+### Frontend
+
+- Django 5
+- React 18 (CDN)
+- Babel (in-browser JSX transform)
+
+### DevOps
+
+- Docker
+- Docker Compose
+- Multi‑service architecture
+
+---
+
+# 🧪 Extensibility
+
+You can easily expand the system by:
+
+- Adding more clothing categories
+- Extending gender rules
+- Adding persistence (Redis, Postgres)
+- Running LangGraph agents with memory
+- Turning FastAPI into a microservices endpoint
+
+---
+
+# 👤 Author
+
+Architected and Developed by **Magno Leite**  
+AI and Software Architect
