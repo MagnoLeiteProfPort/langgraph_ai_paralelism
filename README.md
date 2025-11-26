@@ -210,6 +210,10 @@ api/workflow_graph.png
 - React 18 (CDN)
 - Babel (in-browser JSX transform)
 
+# Screenshot
+
+![alt text](image.png)
+
 ### DevOps
 
 - Docker
