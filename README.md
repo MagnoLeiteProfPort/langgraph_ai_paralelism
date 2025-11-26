@@ -212,7 +212,10 @@ api/workflow_graph.png
 
 # Screenshot
 
+Success
 ![alt text](image.png)
+Failed, 5 attempts
+![alt text](image-1.png)
 
 ### DevOps
 
