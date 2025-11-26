@@ -385,13 +385,17 @@ def render_graph_diagram(output_path: str = "workflow_graph.png") -> None:
 # MAIN EXECUTION
 # ============================================================
 
-if __name__ == "__main__":
+def run_workflow() -> State:
+    """
+    Run the LangGraph workflow once and return the final state.
+    Also (re)generate the workflow_graph.png.
+    """
     configure_logging()
 
     banner("WORKFLOW START")
     logger.info("MAX_ATTEMPTS from env = %d", MAX_ATTEMPTS)
 
-    # Produce diagram
+    # Generate / update diagram in project root
     render_graph_diagram("workflow_graph.png")
 
     initial_state: State = {
@@ -402,12 +406,16 @@ if __name__ == "__main__":
     logger.info("Running workflow...")
 
     final_state: Optional[State] = None
-    step_counter = 0
 
     for update in app.stream(initial_state, stream_mode="values"):
-        step_counter += 1
-        log_state(f"Step {step_counter}", update)
+        log_state("Step", update)
         final_state = update
 
     banner("WORKFLOW COMPLETE")
-    print("\nFinal State:\n", final_state)
+    return final_state or {}
+
+
+if __name__ == "__main__":
+    # Keep CLI usage working as well
+    result = run_workflow()
+    print("\nFinal State:\n", result)

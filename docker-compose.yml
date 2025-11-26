@@ -1,0 +1,22 @@
+#version: "3.9"
+
+services:
+  api:
+    build: ./api
+    container_name: outfit-api
+    env_file:
+      - .env
+    volumes:
+      - ./api:/app   # ⬅️ mount only api code here
+    ports:
+      - "8001:8000"
+
+  web:
+    build: ./web
+    container_name: outfit-web
+    volumes:
+      - ./web:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - api
